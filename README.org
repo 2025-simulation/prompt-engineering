@@ -106,3 +106,4 @@
 * Reference
 [[https://www.promptingguide.ai/zh][Prompt Engineering Guide]]
 
+[[https://prompt-guide.xiniushu.com/][xiniushu prompt guide]]
