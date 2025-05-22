@@ -1,109 +1,51 @@
 #+title: README
-* 目的
-1. 检查是否渲染过程不完备
-2. 规范输入输出
+
+Use prompt-engineering to enhanced and limit the AI performance. 
+
+* Turn on knowledge base in Cherry Studio
+1. in the Settings -> Model Provider -> Gemini -> Manage -> Embedding -> add one model
    
-* Basic
+2. on the left tabs in the Cherry Studio, click *Knowlege Base*. Then add one. 
 
-** 提示词要素
-- 指令
-- 上下文
-- 输入数据
-- 输出提示
-* 提示技术
-** 零样本提示
-限制问题答案
-#+begin_src text 
-  将文本分类为中性、负面或正面。
-  文本：我认为这次假期还可以。
-  情感：
-#+end_src
-** 少样本提示
-提供一些样本。
-容易误导 AI，给出看似正确，实际错误的答案。
-** 链式思考
-
-*** 零样本思维链
-让我们一步步思考。
-
-*** 自动思维链 [[https://github.com/amazon-science/auto-cot][Auto-CoT]]
-给定一些问题，划分为几个分类。
-让 AI 随机抽样，使用 Zero-Short-CoT 生成推理链，作为参考。
-
-*** 自我一致性
-**** 问题
-#+begin_src text
-  提示：
-  当我6岁时，我的妹妹是我的一半年龄。现在我70岁了，我的妹妹多大？
-
-  输出：
-  35
-#+end_src
-???
-
-*** 生成知识提示
-向 AI 补充未知的知识
-
-*** Prompt Chaining
-语言中使用分步来提示。
-#+begin_src text
-  你是一个很有帮助的助手。你的任务是根据文档回答问题。第一步是从文档中提取与问题相关的引文，由####分隔。请使用<quotes></quotes>输出引文列表。如果没有找到相关引文，请回应“未找到相关引文！”。
-
-  ####
-  {{文档}}
-  ####
-#+end_src
-
-*** 思维树 ToT
-非单一专家，发散思考，同时检查。
-#+begin_src text
-  假设三位不同的专家来回答这个问题。
-  所有专家都写下他们思考这个问题的第一个步骤，然后与大家分享。
-  然后，所有专家都写下他们思考的下一个步骤并分享。
-  以此类推，直到所有专家写完他们思考的所有步骤。
-  只要大家发现有专家的步骤出错了，就让这位专家离开。
-  请问...
-#+end_src 
-
-*** 检索增强生成 [[https://ai.meta.com/blog/retrieval-augmented-generation-streamlining-the-creation-of-intelligent-natural-language-processing-models/][RAG]]
-接受输入并检索出一组旺端，作为上下文和输入的原始提示词组合。
-可能可以用来学习新的编程语言，这个部分需要深入学习。
-适用于知识密集型任务中增强语言模型输出。
+3. Finally drag specific file in it. Then enable kowledge base when communicating with AI. 
 
 
-*** 自动推理并使用工具 ART
-遇到新任务的时候，会暂停生成，先选择工具来整合输出，最后继续生成。
+* The most helpful prompt-tech
+1. Prompt Chaining
+   语言中使用分步来提示。
+   #+begin_src text
+     你是一个很有帮助的助手。你的任务是根据文档回答问题。第一步是从文档中提取与问题相关的引文，由####分隔。请使用<quotes></quotes>输出引文列表。如果没有找到相关引文，请回应“未找到相关引文！”。
+   
+     ####
+     {{文档}}
+     ####
+   #+end_src
+   
+2. 思维树 ToT
+   非单一专家，发散思考，同时检查。
+   #+begin_src text
+     假设三位不同的专家来回答这个问题。
+     所有专家都写下他们思考这个问题的第一个步骤，然后与大家分享。
+     然后，所有专家都写下他们思考的下一个步骤并分享。
+     以此类推，直到所有专家写完他们思考的所有步骤。
+     只要大家发现有专家的步骤出错了，就让这位专家离开。
+     请问...
+   #+end_src 
 
-*** 自动提示工程师 APE
-效果优于零样本提示
+3. 检索增强生成 [[https://ai.meta.com/blog/retrieval-augmented-generation-streamlining-the-creation-of-intelligent-natural-language-processing-models/][RAG]]
+   接受输入并检索出一组旺端，作为上下文和输入的原始提示词组合。
+   可能可以用来学习新的编程语言，这个部分需要深入学习。
+   适用于知识密集型任务中增强语言模型输出。
+   
+   很多问题解决需要基本的常识。而 AI 的基本常识在训练的时候使用的数据集就已经限制了他的基本常识储量。
+   当然 AI 在对话的时候也可以做到补充常识，但是大量的基础知识补充通过对话补充是复杂的。当然现在 AI 也可以通过联网的方式补充，这受限于网络的知识储量。
+   
+   如果我们有大量的新的知识需要补充就可以利用 RAG。
+   
+4. Active-Prompt
+   第一步是使用或不使用少量 CoT 示例查询 LLM。对一组训练问题生成 k 个可能的答案。基于 k 个答案计算不确定度度量（使用不一致性）。选择最不确定的问题由人类进行注释。然后使用新的注释范例来推断每个问题。
+   
+   或许可以用来辅助注释文档的生成。
 
-
-*** Active-Prompt
-第一步是使用或不使用少量 CoT 示例查询 LLM。对一组训练问题生成 k 个可能的答案。基于 k 个答案计算不确定度度量（使用不一致性）。选择最不确定的问题由人类进行注释。然后使用新的注释范例来推断每个问题。
-
-或许可以用来辅助注释文档的生成。
-
-*** 方向性刺激提示
-
-
-*** 程序辅助语言模型 PAL
-读取自然语言问题，生成程序而不是文本，最后使用程序执行的结果回答问题。
-
-*** ReAct 框架
-交互式框架，不仅使用原有的文档，还会收集外部数据。
-
-*** 自我反思 Reflexion
-越多的实践，提升越多，但是如何支持越来越长的上下文。
-
-*** 多模态思维链提示方法
-这适合多样的输入回答，也就是根据图片等等，推测。
-
-*** 基于图的提示
-
-
-*** meta-prompting
-
-* Reference
-[[https://www.promptingguide.ai/zh][Prompt Engineering Guide]]
-
-[[https://prompt-guide.xiniushu.com/][xiniushu prompt guide]]
+5. 自我反思 Reflexion
+   越多的实践，提升越多，但是如何支持越来越长的上下文。
